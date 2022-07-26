@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 
-const TrackSchema = mongoose.Schema({
+const TrackSchema = new mongoose.Schema({
     
          name: {
             type: String,
@@ -12,7 +12,7 @@ const TrackSchema = mongoose.Schema({
          cover: {
             type: String,
             validate: {
-                validate: (req) => {
+                validator: (req) => {
                     return true;
                 },
             message: "Error_URL_Not_Valid"    
