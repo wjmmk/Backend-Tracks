@@ -18,7 +18,7 @@ const createItem = async (req, res) => {
    // console.log(body, file);
     const fileData = {
         filename: file.filename,
-        url: `${process.env.PUBLIC_URL}/${file.filename}`,
+        url: `${PUBLIC_URL}/${file.filename}`,
     }
 
     const data = await storagesModel.create(fileData);
