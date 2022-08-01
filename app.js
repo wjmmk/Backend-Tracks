@@ -1,6 +1,10 @@
 require("dotenv").config();
 const express = require('express');
 const cors = require('cors');
+
+const morganBody = require('morgan-body');
+const loggerstream = require('./utils/handleLoggerSlack');
+
 const dbConnect = require('./config/mongo');
 
 const app = express();
@@ -8,6 +12,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('uploads'));
+
+
+morganBody(app, {
+  noColors: true,
+  stream: loggerstream,
+  skip: function(req, res) {
+    return res.statusCode < 400;
+  }
+});
 
 // Se hace uso de las rutas de los archivos de rutas
 app.use("/api", require("./routes"));
