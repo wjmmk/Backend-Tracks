@@ -11,7 +11,7 @@ const validateCreateItem = [
     check('artist.nationality').not().isEmpty().withMessage('Artist nationality is require'),
     check('duration.start').not().isEmpty().withMessage('Duration start is required'),
     check('duration.end').not().isEmpty().withMessage('Duration end is required'),
-    check('mediaId').not().isEmpty().isMongoId().withMessage('mediaId is required'),
+    check('mediaId').not().isEmpty().withMessage('mediaId is required'),
 
     (req, res, next) => validateResult(req, res, next)
 ]

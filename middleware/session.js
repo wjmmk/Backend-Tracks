@@ -1,6 +1,9 @@
 const handleHttpError  = require('../utils/handleError');
 const { verifyToken } = require('../utils/handleJwt');
 const {usersModel} = require('../models');
+const getProperties = require('../utils/handlePropertiesEngine');
+const propertiesKey = getProperties();// tomas las propiedades del los (_id:id) del las bases de datos para usarlos independientemente de la base de datos
+
 
 const authMiddleware = async (req, res, next) => {
     try {
@@ -9,17 +12,20 @@ const authMiddleware = async (req, res, next) => {
             handleHttpError(res, "Token is required", 401);
             return;
         }
-        const user = await verifyToken(token);
-        req.user = user;
+        const dataToken = await verifyToken(token);
+        req.user = dataToken;
 
-        if(!user._id) {
+        if(!dataToken) {
             handleHttpError(res, "Invalid token", 401);
             return;
         }
 
-        const userDb = await usersModel.findById(user._id);
-        req.userDb = userDb;
+        const query = {
+            [propertiesKey.id]: dataToken[propertiesKey.id]
+        }
 
+        const userDb = await usersModel.findOne({query});
+        req.userDb = userDb;
 
         next();
     } catch (error) {

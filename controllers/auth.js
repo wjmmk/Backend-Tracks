@@ -1,33 +1,43 @@
 const { matchedData } = require('express-validator');
 const { tokenSign } = require('../utils/handleJwt');
 const { encrypt, compare } = require('../utils/handlePassword');
-const handleHttpError = require('../utils/handleError');
+const {handleHttpError} = require('../utils/handleError');
 const { usersModel } = require('../models');
 
 
 const registerController = async (req, res) => {
     try {
         req = matchedData(req);
-        const password = await encrypt(req.password);
-        const body = { ...req, password };
-        const dataUser = await usersModel.create(body);
-        dataUser.set('password', undefined, { strict: false });
-
-        const result = {
-            token: await tokenSign(dataUser),
-            user: dataUser
+        const user = await usersModel.findOne({ where: {email: req.email} });
+        if (user) {
+            throw new Error('User already exists');
         }
+        const hashPassword = await encrypt(req.password);
+        const newUser = await usersModel.create({
+            username: req.username,
+            age: req.age,
+            email: req.email,
+            password: hashPassword,
+            rol: req.rol
+        });
 
-        res.send({ result })
-    } catch (error) {
-        handleHttpError(error, res);
+        newUser.set('password', undefined, { strict: false });
+        const result = {
+            user: newUser,
+            token: tokenSign(newUser)
+        };
+        res.send({ result });
+    }
+    catch (error) {
+        handleHttpError(res, error.message);
     }
 }
+
 
 const loginController = async (req, res) => {
     try {
         req = matchedData(req);
-        const user = await usersModel.findOne({ email: req.email }).select('password username rol email');
+        const user = await usersModel.findOne({ email: req.email })
         if (!user) {
             handleHttpError(res, "User not found", 404);
             return;
