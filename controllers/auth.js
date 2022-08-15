@@ -2,7 +2,7 @@ const { matchedData } = require('express-validator');
 const { tokenSign } = require('../utils/handleJwt');
 const { encrypt, compare } = require('../utils/handlePassword');
 const {handleHttpError} = require('../utils/handleError');
-const { usersModel } = require('../models');
+const { usersModel } = require('../models/index');
 
 
 const registerController = async (req, res) => {
@@ -62,4 +62,13 @@ const loginController = async (req, res) => {
     }
 }
 
-module.exports = { loginController, registerController };
+  const getItems = async (req, res) => {
+    try {
+      const data = await usersModel.find({});
+      res.send({ data });
+    } catch (error) {
+      handleHttpError(res, "ERROR_LIST_ITEMS")
+    }  
+  }
+
+module.exports = { loginController, registerController, getItems };
