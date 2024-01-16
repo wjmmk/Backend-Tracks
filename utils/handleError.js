@@ -1,8 +1,7 @@
 
-const handleHttpError = (res, error) => {
-    console.log(error);
+const handleHttpError = (res, message) => {
     res.status(500);
-    res.send({ error: "ERROR" });
+    res.send({ error: message });
 }
 
 const handleErrorResponse = ( res, mesage = "Algo salio mal", code = 401) => {

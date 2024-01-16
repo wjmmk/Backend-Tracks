@@ -6,21 +6,19 @@ const { usersModel } = require('../models/index');
 
 const registerController = async (req, res) => {
     try {
-        //req = matchedData(req);
-        console.log(req.body)
-        const { email } = req.body
-        const user = await usersModel.findOne({ where: {email: email } });
-        console.log(user)
+        const { username, age, email, password, rol } = req.body
+        const user = await usersModel.findOne({ email });
+      
         if (user) {
             throw new Error('User already exists!!!');
         }
-        const hashPassword = await encrypt(req.password);
+        const hashPassword = encrypt(password);
         const newUser = await usersModel.create({
-            username: req.username,
-            age: req.age,
-            email: req.email,
+            username: username,
+            age: age,
+            email: email,
             password: hashPassword,
-            rol: req.rol
+            rol: rol
         });
 
         newUser.set('password', undefined, { strict: false });
@@ -39,14 +37,14 @@ const registerController = async (req, res) => {
 const loginController = async (req, res) => {
     try {
         req = matchedData(req);
-        const user = await usersModel.findOne({ email: req.email })
+        const user = await usersModel.findOne({ email: req.body.email })
         if (!user) {
             handleHttpError(res, "User not found", 404);
             return;
         }
 
         const hashPassword = user.get('password');
-        const checkPassword = compare(req.password, hashPassword);
+        const checkPassword = compare(req.body.password, hashPassword);
 
         if (!checkPassword) {
             handleHttpError(res, "Password is incorrect", 401);
