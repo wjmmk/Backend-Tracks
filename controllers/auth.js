@@ -1,16 +1,18 @@
-const { matchedData } = require('express-validator');
 const { tokenSign } = require('../utils/handleJwt');
-const { encrypt, compare } = require('../utils/handlePassword');
+const { encrypt, compare } = require('../utils/handlePasswordBcrypt');
 const {handleHttpError} = require('../utils/handleError');
 const { usersModel } = require('../models/index');
 
 
 const registerController = async (req, res) => {
     try {
-        req = matchedData(req);
-        const user = await usersModel.findOne({ where: {email: req.email} });
+        //req = matchedData(req);
+        console.log(req.body)
+        const { email } = req.body
+        const user = await usersModel.findOne({ where: {email: email } });
+        console.log(user)
         if (user) {
-            throw new Error('User already exists');
+            throw new Error('User already exists!!!');
         }
         const hashPassword = await encrypt(req.password);
         const newUser = await usersModel.create({
