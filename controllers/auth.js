@@ -1,3 +1,4 @@
+const { matchedData } = require('express-validator')
 const { tokenSign } = require('../utils/handleJwt');
 const { encrypt, compare } = require('../utils/handlePasswordBcrypt');
 const {handleHttpError} = require('../utils/handleError');
@@ -5,31 +6,32 @@ const { usersModel } = require('../models/index');
 
 
 const registerController = async (req, res) => {
-    try {
-        const { username, age, email, password, rol } = req.body
+    try {     
+        const { username, age, email, password, rol } = req.body;  
         const user = await usersModel.findOne({ email });
-      
-        if (user) {
-            throw new Error('User already exists!!!');
-        }
-        const hashPassword = encrypt(password);
-        const newUser = await usersModel.create({
-            username: username,
-            age: age,
-            email: email,
-            password: hashPassword,
-            rol: rol
-        });
+          
+        if (!user) {
+            const hashPassword = encrypt(password);
+            const newUser = await usersModel.create({
+                username: username,
+                age: age,
+                email: email,
+                password: hashPassword,
+                rol: rol
+            });
 
-        newUser.set('password', undefined, { strict: false });
-        const result = {
-            user: newUser,
-            token: tokenSign(newUser)
-        };
-        res.send({ result });
+            newUser.set('password', undefined, { strict: false });
+            const result = {
+                user: newUser,
+                token: tokenSign(newUser)
+            };
+            res.send({ result });
+        }  else {
+            res.send({code: 500, message: "User_Exist !!!"})
+        }
     }
     catch (error) {
-        handleHttpError(res, error.message);
+        console.log(error)
     }
 }
 

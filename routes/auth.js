@@ -6,8 +6,7 @@ const { loginController, registerController, getItems } = require('../controller
 
 // Routes: http://localhost:3001/api/auth/{login,register,users}
 router.get("/users", getItems)
-/* router.post('/register', validateRegister, registerController); */
-router.post('/register', registerController);
+router.post('/register',validateRegister, registerController);
 router.post('/login', validateLogin, loginController);
 
 
